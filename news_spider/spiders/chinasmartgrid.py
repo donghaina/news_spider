@@ -20,6 +20,7 @@ class ChinasmartgridSpider(scrapy.Spider):
             news_item['origin_host'] = self.allowed_domains[0]
             news_item['origin_url'] = info_item.xpath(".//a/@href").extract_first()
             news_item['section'] = '北极星智能电网在线 > 市场'
+            news_item['abstract'] = ''
             news_item['published_at'] = info_item.xpath(".//span/text()").extract_first().strip()
 
             if self.today != news_item['published_at']:

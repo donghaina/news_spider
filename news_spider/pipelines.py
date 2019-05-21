@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 from scrapy.conf import settings
 import pymysql
 
@@ -39,15 +35,10 @@ class NewsSpiderPipeline(object):
 
             else:
                 # 插入数据
-                print('-------------要插入了——————————————')
-                self.cursor.execute(
-                    """insert into source(title, origin_website, origin_url, origin_host ,published_at)
-                    value (%s, %s, %s, %s, %s)""",
-                    (item['title'],
-                     item['origin_website'],
-                     item['origin_url'],
-                     item['origin_host'],
-                     item['published_at']))
+                instert_sql = """insert into source(title, origin_website,origin_url, origin_host, abstract, section, published_at) values ('%s','%s', '%s', '%s', '%s', '%s', '%s')""" % (
+                item['title'], item['origin_website'], item['origin_url'], item['origin_host'], item['abstract'], item['section'], item['published_at'])
+                print(instert_sql)
+                self.cursor.execute(instert_sql)
 
                 # 提交sql语句
             self.connect.commit()
