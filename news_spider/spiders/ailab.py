@@ -4,7 +4,7 @@ import time
 from news_spider.items import NewsSpiderItem
 
 
-class ChinasmartgridSpider(scrapy.Spider):
+class NewsSpider(scrapy.Spider):
     name = 'ailab'
     allowed_domains = ['www.ailab.cn']
     start_urls = ['http://www.ailab.cn']
