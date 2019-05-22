@@ -21,6 +21,7 @@ class NewsSpiderPipeline(object):
         self.cursor = self.connect.cursor();
 
     def process_item(self, item, spider):
+        print(item)
         try:
             # 查重处理
             self.cursor.execute(
