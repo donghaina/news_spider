@@ -1,0 +1,21 @@
+Server: Tengine
+Content-Type: text/html; charset=utf-8
+Date: Thu, 23 May 2019 07:04:18 GMT
+Vary: Accept-Encoding
+X-Frame-Options: DENY
+X-Xss-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+Content-Security-Policy: script-src 'self' 'unsafe-inline' 'unsafe-eval' *.jianshu.com *.jianshu.io api.geetest.com static.geetest.com dn-staticdown.qbox.me zz.bdstatic.com *.google-analytics.com hm.baidu.com push.zhanzhang.baidu.com res.wx.qq.com qzonestyle.gtimg.cn as.alipayobjects.com nbrecsys.4paradigm.com shared.ydstatic.com gorgon.youdao.com ;style-src 'self' 'unsafe-inline' *.jianshu.com *.jianshu.io api.geetest.com static.geetest.com shared.ydstatic.com ;
+Etag: W/"42dab9d49b49bb1da65e18656fab4817"
+Cache-Control: max-age=0, private, must-revalidate
+Set-Cookie: signin_redirect=https%3A%2F%2Fwww.jianshu.com%2F; path=/
+Set-Cookie: read_mode=day; path=/
+Set-Cookie: default_font=font2; path=/
+Set-Cookie: locale=zh-CN; path=/
+X-Request-Id: 98c79bf3-f8b9-46b7-8427-f59efcc2c033
+X-Runtime: 0.009493
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Content-Encoding: gzip
+Via: cache41.l2cm12-6[29,0], cache14.cn224[108,0]
+Timing-Allow-Origin: *
+Eagleid: 7909f42215585950582855692e

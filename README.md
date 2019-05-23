@@ -7,4 +7,5 @@ $ scrapy crawl ailab
 $ scrapy crawl ai_ofweek
 $ scrapy crawl zhidx
 $ scrapy crawl elecfans
+$ scrapy crawl aistudyblog
 ```

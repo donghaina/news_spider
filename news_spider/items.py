@@ -17,3 +17,4 @@ class NewsSpiderItem(scrapy.Item):
     abstract = scrapy.Field()
     section = scrapy.Field()
     published_at = scrapy.Field()
+    created_at = scrapy.Field()

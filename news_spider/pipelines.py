@@ -36,8 +36,8 @@ class NewsSpiderPipeline(object):
 
             else:
                 # 插入数据
-                instert_sql = """insert into source(title, origin_website,origin_url, origin_host, abstract, section, published_at) values ('%s','%s', '%s', '%s', '%s', '%s', '%s')""" % (
-                item['title'], item['origin_website'], item['origin_url'], item['origin_host'], item['abstract'], item['section'], item['published_at'])
+                instert_sql = """insert into source(title, origin_website,origin_url, origin_host, abstract, section, published_at,created_at) values ('%s','%s', '%s', '%s', '%s', '%s', '%s',%s)""" % (
+                item['title'], item['origin_website'], item['origin_url'], item['origin_host'], item['abstract'], item['section'], item['published_at'],item['created_at'])
                 print(instert_sql)
                 self.cursor.execute(instert_sql)
 

@@ -13,7 +13,7 @@ class NewsSpider(scrapy.Spider):
     # today = time.mktime(time.strptime('2019-05-01', '%Y-%m-%d'))
 
     today = time.time()
-    
+
     def parse(self, response):
         nav_list = response.xpath("//div[@class='ns_area list']/ul/li[not(@class='first')]")
         section = {}

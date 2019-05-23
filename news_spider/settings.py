@@ -16,7 +16,14 @@ ITEM_PIPELINES = {
     'news_spider.pipelines.NewsSpiderPipeline': 3
 }
 
+HTTPCACHE_ENABLED = True
+TELNETCONSOLE_ENABLED = False
+
 MYSQL_HOST = 'localhost'
 MYSQL_DBNAME = 'news'
 MYSQL_USER = 'root'
 MYSQL_PASSWD = 'root'
+
+# FEED_FORMAT = 'json'
+# FEED_URI = 'result.json'
+# FEED_EXPORT_ENCODING = 'utf-8'
