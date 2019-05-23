@@ -48,11 +48,16 @@ class ChinasmartgridSpider(scrapy.Spider):
         if next_link:
             yield scrapy.Request('http://www.chinasmartgrid.com.cn/' + next_link, callback=self.parse)
 
-    def parseTimestamp(self, dataStr):
-        dateStr = dataStr.split('&nbsp;&nbsp;')
-        dateNow = dateStr[1].strip()
-        print(dateNow)
+            yield scrapy.Request(news_item['origin_url'], meta={'item': news_item}, callback=self.detail_parse)
+            # yield news_item
 
-        dt = datetime.datetime.strptime(dateNow, "%Y-%m-%d")
+    def detail_parse(self, response):
+        item = response.meta['item']
+        item['published_at'] = response.xpath(
+            "//div[@class='post-related']/span[@class='time']/text()").extract_first().strip().replace('/', '-')
+        print(item)
+
+    def parseTimestamp(self, dataStr):
+        dt = datetime.datetime.strptime(dataStr, "%Y-%m-%d")
         ts = dt.timestamp()
         return int(ts)
