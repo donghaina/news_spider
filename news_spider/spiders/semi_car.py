@@ -6,17 +6,18 @@ import datetime
 from news_spider.items import NewsSpiderItem
 
 
-
+#状态，完成了后续页面的抓取，第一个页面的需要单独添加
 class ChinasmartgridSpider(scrapy.Spider):
     name = 'semi_car'
     domain = 'http://ecar.semi.org.cn/'
-    allowed_domains = ['http://ecar.semi.org.cn/']
-    start_urls = ['http://ecar.semi.org.cn/']
-    today = time.strftime('%Y-%m-%d', time.localtime())
+    allowed_domains = ['ecar.semi.org.cn']
+    i = 2
+    start_urls = ['http://ecar.semi.org.cn/indexLoading_2.html']
+    deadline = int(time.time()) - 10 * 24 * 3600 #暂时只抓取10天之内的数据
 
     #parse first page
     def parse(self, response):
-        news_list = response.xpath("//div[@class='article']")
+        news_list = response.xpath("//div[@class='list']")
 
         for info_item in news_list:
             news_item = NewsSpiderItem()
@@ -25,34 +26,29 @@ class ChinasmartgridSpider(scrapy.Spider):
             news_item['origin_host'] = self.allowed_domains[0]
             news_item['origin_url'] = info_item.xpath(".//h2/a/@href").extract_first()
             news_item['section'] = 'SEMI大导体产业网 > 汽车电子应用'
-            news_item['abstract'] = ''
-            news_item['published_at'] = self.parseTimestamp(info_item.xpath(".//td[last()]/text()"))
+            news_item['abstract'] = info_item.xpath(".//div[@class='abstract']/text()").extract_first().strip()
+            news_item['published_at'] = self.parseTimestamp(info_item.xpath(".//div[@class='inputdate']/text()").extract_first())
+            print(news_item)
 
-            if self.today != news_item['published_at']:
+
+            if self.deadline > news_item['published_at']:
                 return
 
             # print(news_item)
 
             yield news_item
-        # for info_item in news_list:
-        #     yield {
-        #         'title': info_item.xpath(".//a/@title").extract_first(),
-        #         'origin_website': '智能电网市场',
-        #         'origin_host': self.allowed_domains[0],
-        #         'origin_url': info_item.xpath(".//a/@href").extract_first(),
-        #         'published_at': info_item.xpath(".//span/text()").extract_first()
-        #     }
 
-        next_link = response.xpath("//div[@class='list_page']/div[@class='page']/a[@title='下一页']/@href").extract_first()
-
-        if next_link:
-            yield scrapy.Request('http://www.chinasmartgrid.com.cn/' + next_link, callback=self.parse)
+        self.i = self.i + 1
+        yield scrapy.Request('http://ecar.semi.org.cn/indexLoading_'+ str(self.i) +'.html', callback=self.parse)
 
     def parseTimestamp(self, dataStr):
-        dateStr = dataStr.split('&nbsp;&nbsp;')
-        dateNow = dateStr[1].strip()
-        print(dateNow)
+        ts = 0
+        print(dataStr)
+        dateStr = (str(dataStr)).split('\xa0\xa0')
+        print(dateStr)
+        if(len(dateStr) > 1):
+            dateNow = dateStr[1].strip()
 
-        dt = datetime.datetime.strptime(dateNow, "%Y-%m-%d")
-        ts = dt.timestamp()
+            dt = datetime.datetime.strptime(dateNow, "%Y-%m-%d %H:%M:%S")
+            ts = dt.timestamp()
         return int(ts)
