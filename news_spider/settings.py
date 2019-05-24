@@ -16,7 +16,6 @@ ITEM_PIPELINES = {
     'news_spider.pipelines.NewsSpiderPipeline': 3
 }
 
-<<<<<<< HEAD
 HTTPCACHE_ENABLED = True
 TELNETCONSOLE_ENABLED = False
 
@@ -28,9 +27,7 @@ MYSQL_PASSWD = 'root'
 # FEED_FORMAT = 'json'
 # FEED_URI = 'result.json'
 # FEED_EXPORT_ENCODING = 'utf-8'
-=======
-MYSQL_HOST = '10.10.10.2'
-MYSQL_DBNAME = 'tycho'
-MYSQL_USER = 'root'
-MYSQL_PASSWD = '8ik,.lo9'
->>>>>>> 完成一个 semi_car
+# MYSQL_HOST = '10.10.10.2'
+# MYSQL_DBNAME = 'tycho'
+# MYSQL_USER = 'root'
+# MYSQL_PASSWD = '8ik,.lo9'

@@ -18,14 +18,14 @@ class NewsSpiderPipeline(object):
             use_unicode=True)
 
         # 通过cursor执行增删查改
-        self.cursor = self.connect.cursor();
+        self.cursor = self.connect.cursor()
 
     def process_item(self, item, spider):
         print(item)
         try:
             # 查重处理
             self.cursor.execute(
-                """select * from news_source where title = %s""",
+                """select * from source where title = %s""",
                 item['title'])
             # 是否有重复数据
             repetition = self.cursor.fetchone()
@@ -36,13 +36,9 @@ class NewsSpiderPipeline(object):
 
             else:
                 # 插入数据
-<<<<<<< HEAD
                 instert_sql = """insert into source(title, origin_website,origin_url, origin_host, abstract, section, published_at,created_at) values ('%s','%s', '%s', '%s', '%s', '%s', '%s',%s)""" % (
-                item['title'], item['origin_website'], item['origin_url'], item['origin_host'], item['abstract'], item['section'], item['published_at'],item['created_at'])
-=======
-                instert_sql = """insert into news_source(title, origin_website,origin_url, origin_host, abstract, section, published_at) values ('%s','%s', '%s', '%s', '%s', '%s', '%s')""" % (
-                item['title'], item['origin_website'], item['origin_url'], item['origin_host'], item['abstract'], item['section'], item['published_at'])
->>>>>>> 完成一个 semi_car
+                    item['title'], item['origin_website'], item['origin_url'], item['origin_host'], item['abstract'], item['section'], item['published_at'], item['created_at'])
+
                 print(instert_sql)
                 self.cursor.execute(instert_sql)
 
