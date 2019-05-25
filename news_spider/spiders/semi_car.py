@@ -6,16 +6,17 @@ import datetime
 from news_spider.items import NewsSpiderItem
 
 
-#状态，完成了后续页面的抓取，第一个页面的需要单独添加
-class ChinasmartgridSpider(scrapy.Spider):
+# 状态，完成了后续页面的抓取，第一个页面的需要单独添加
+class NewsSpider(scrapy.Spider):
     name = 'semi_car'
     domain = 'http://ecar.semi.org.cn/'
     allowed_domains = ['ecar.semi.org.cn']
-    i = 2
-    start_urls = ['http://ecar.semi.org.cn/indexLoading_2.html']
-    deadline = int(time.time()) - 10 * 24 * 3600 #暂时只抓取10天之内的数据
+    start_page = 1
+    start_urls = ['http://ecar.semi.org.cn']
 
-    #parse first page
+    # deadline = int(time.time()) - 10 * 24 * 3600  # 暂时只抓取10天之内的数据
+
+    # parse first page
     def parse(self, response):
         news_list = response.xpath("//div[@class='list']")
 
@@ -27,28 +28,24 @@ class ChinasmartgridSpider(scrapy.Spider):
             news_item['origin_url'] = info_item.xpath(".//h2/a/@href").extract_first()
             news_item['section'] = 'SEMI大导体产业网 > 汽车电子应用'
             news_item['abstract'] = info_item.xpath(".//div[@class='abstract']/text()").extract_first().strip()
-            news_item['published_at'] = self.parseTimestamp(info_item.xpath(".//div[@class='inputdate']/text()").extract_first())
-            print(news_item)
-
-
-            if self.deadline > news_item['published_at']:
-                return
+            news_item['created_at'] = int(datetime.datetime.now().timestamp())
+            published_at = info_item.xpath(".//div[@class='inputdate']/text()").extract_first()
+            news_item['published_at'] = self.parse_timestamp(published_at)
+            # if self.deadline > news_item['published_at']:
+            #     return
 
             # print(news_item)
 
             yield news_item
 
-        self.i = self.i + 1
-        yield scrapy.Request('http://ecar.semi.org.cn/indexLoading_'+ str(self.i) +'.html', callback=self.parse)
+        self.start_page = self.start_page + 1
+        yield scrapy.Request('http://ecar.semi.org.cn/indexLoading_' + str(self.start_page) + '.html', callback=self.parse)
 
-    def parseTimestamp(self, dataStr):
+    def parse_timestamp(self, dataStr):
         ts = 0
-        print(dataStr)
         dateStr = (str(dataStr)).split('\xa0\xa0')
-        print(dateStr)
-        if(len(dateStr) > 1):
+        if (len(dateStr) > 1):
             dateNow = dateStr[1].strip()
-
             dt = datetime.datetime.strptime(dateNow, "%Y-%m-%d %H:%M:%S")
             ts = dt.timestamp()
         return int(ts)

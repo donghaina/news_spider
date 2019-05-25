@@ -6,7 +6,7 @@ import datetime
 from news_spider.items import NewsSpiderItem
 
 
-class ChinasmartgridSpider(scrapy.Spider):
+class NewsSpider(scrapy.Spider):
     name = 'semi_ic'
     domain = 'http://www.semi.org.cn/technology/'
     allowed_domains = ['www.semi.org.cn']
