@@ -32,7 +32,11 @@ class NewsSpiderPipeline(object):
 
             # 重复
             if repetition:
-                pass
+                update_sql = """update news_source set origin_website = '%s',origin_url = '%s', origin_host = '%s',abstract = '%s',section = '%s',published_at = '%s' where title = '%s'""" % (
+                    item['origin_website'], item['origin_url'], item['origin_host'], item['abstract'], item['section'], item['published_at'], item['title'])
+                print(update_sql)
+                self.cursor.execute(update_sql)
+                # pass
 
             else:
                 # 插入数据
