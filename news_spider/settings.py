@@ -19,15 +19,15 @@ ITEM_PIPELINES = {
 HTTPCACHE_ENABLED = True
 TELNETCONSOLE_ENABLED = False
 
-MYSQL_HOST = 'localhost'
-MYSQL_DBNAME = 'news'
-MYSQL_USER = 'root'
-MYSQL_PASSWD = 'root'
+# MYSQL_HOST = 'localhost'
+# MYSQL_DBNAME = 'news'
+# MYSQL_USER = 'root'
+# MYSQL_PASSWD = 'root'
 
 # FEED_FORMAT = 'json'
 # FEED_URI = 'result.json'
 # FEED_EXPORT_ENCODING = 'utf-8'
-# MYSQL_HOST = '10.10.10.2'
-# MYSQL_DBNAME = 'tycho'
-# MYSQL_USER = 'root'
-# MYSQL_PASSWD = '8ik,.lo9'
+MYSQL_HOST = '10.10.10.2'
+MYSQL_DBNAME = 'tycho'
+MYSQL_USER = 'root'
+MYSQL_PASSWD = '8ik,.lo9'
