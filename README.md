@@ -20,3 +20,4 @@ $ scrapy crawl aistudyblog
 |www.dramx.com|  Y | N| Y | N|
 |www.csia.net.cn |  Y | N| Y | N|
 |www.semi.ac.cn|  Y | N| Y | N|
+|ai.ofweek.com|  Y | N| Y | N|
