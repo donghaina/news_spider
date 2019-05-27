@@ -15,6 +15,11 @@ class NewsSpider(scrapy.Spider):
     db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
     deadline = int(db_cursor.fetchone()[0])
 
+    def start_requests(self):
+        return [scrapy.FormRequest(url=self.start_urls[0], dont_filter=True, callback=self.parse),
+                scrapy.FormRequest(url=self.start_urls[1], dont_filter=True, callback=self.parse),
+                scrapy.FormRequest(url=self.start_urls[2], dont_filter=True, callback=self.parse)]
+
     def err_callback(self, response):
         print('----出错了----')
         print(response)

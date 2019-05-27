@@ -14,6 +14,9 @@ class NewsSpider(scrapy.Spider):
     db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
     deadline = int(db_cursor.fetchone()[0])
 
+    def start_requests(self):
+        return [scrapy.FormRequest(url=self.start_urls[0], dont_filter=True, callback=self.parse)]
+
     def parse(self, response):
         news_list = response.xpath("//ul[@class='list_left_ul']/li[not(@class='dashed_line')]")
 

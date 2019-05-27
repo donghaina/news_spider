@@ -36,7 +36,7 @@ class NewsSpider(scrapy.Spider):
         ]
 
     def start_requests(self):
-        return [scrapy.FormRequest(url=self.start_urls[0], formdata={}, callback=self.parse_login)]
+        return [scrapy.FormRequest(url=self.start_urls[0], dont_filter=True, callback=self.parse_login)]
 
     def parse(self, response):
         news_list = response.xpath("//table[@class='gongzuo']/tr")
