@@ -18,18 +18,15 @@ class NewsSpider(scrapy.Spider):
     deadline = int(db_cursor.fetchone()[0])
 
     def start_requests(self):
-        return [scrapy.FormRequest(url=self.start_urls[0], dont_filter=True, formdata={'action': 'category_list', 'page': str(self.start_page)}, callback=self.parse_list)]
+        return [scrapy.FormRequest(url=self.start_urls[0], dont_filter=True, formdata={'action': 'category_list', 'page': str(self.start_page)}, callback=self.parse)]
 
-    def parse_list(self, response):
+    def parse(self, response):
         news_item = NewsSpiderItem()
         news_list = json.loads(response.body_as_unicode())['result']
         if len(news_list) == 0:
             return
         else:
             for info_item in news_list:
-                # self.db_cursor.execute("""select max(published_at) from news_source where origin_url = %s""", info_item['link'])
-                # if self.db_cursor.fetchone():
-                #     return
                 news_item['title'] = info_item['title']
                 news_item['origin_website'] = '智东西'
                 news_item['created_at'] = int(datetime.datetime.now().timestamp())
@@ -45,7 +42,7 @@ class NewsSpider(scrapy.Spider):
                 dont_filter=True,
                 url=self.start_urls[0],
                 formdata={'action': 'category_list', 'page': str(self.start_page)},
-                callback=self.parse_list
+                callback=self.parse
             )
 
     def detail_parse(self, response):
