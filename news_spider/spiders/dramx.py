@@ -16,10 +16,16 @@ class NewsSpider(scrapy.Spider):
     db_cursor = news_pipeline.cursor
     db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
     deadline = int(db_cursor.fetchone()[0])
+    print('deadline', deadline)
 
     def err_callback(self, response):
         print('----出错了----')
         print(response)
+
+    def start_requests(self):
+        return [scrapy.FormRequest(url=self.start_urls[0], dont_filter=True, callback=self.parse),
+                scrapy.FormRequest(url=self.start_urls[1], dont_filter=True, callback=self.parse),
+                scrapy.FormRequest(url=self.start_urls[2], dont_filter=True, callback=self.parse)]
 
     def parse(self, response):
         news_list = response.xpath("//div[@id='divArticleList']/div[contains(@class,'Article-box-cont')]/div[@class='Article-content']")
@@ -32,12 +38,11 @@ class NewsSpider(scrapy.Spider):
             news_item['section'] = '全球半导体观察 > ' + response.xpath("//a[@class='Article-boxtitle-active']/text()").extract_first()
             news_item['abstract'] = info_item.xpath(".//p[@class='Article-essay']/text()").extract_first()
             news_item['created_at'] = int(datetime.datetime.now().timestamp())
-            scrapy.Request(news_item['origin_url'], meta={'item': news_item}, callback=self.detail_parse)
+            yield scrapy.Request(news_item['origin_url'], meta={'item': news_item}, callback=self.detail_parse, dont_filter=True)
 
         next_link = response.xpath("(//div[@class='jogger']/a)[last()]/@href").extract_first()
-
         if next_link:
-            yield scrapy.Request('https://www.dramx.com' + next_link, callback=self.parse, errback=self.err_callback)
+            yield scrapy.Request('https://www.dramx.com' + next_link, callback=self.parse, errback=self.err_callback, dont_filter=True)
 
     def detail_parse(self, response):
         item = response.meta['item']
