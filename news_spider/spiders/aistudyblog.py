@@ -27,7 +27,7 @@ class NewsSpider(scrapy.Spider):
                 news_item['origin_website'] = '人工智能科技'
                 news_item['created_at'] = int(datetime.datetime.now().timestamp())
                 news_item['published_at'] = int(datetime.datetime.strptime(info_item['CreateTime'], "%Y-%m-%d").timestamp())
-                if self.deadline >= news_item['published_at']:
+                if self.deadline > news_item['published_at']:
                     return
                 news_item['origin_host'] = self.allowed_domains[0]
                 news_item['origin_url'] = 'http://www.aistudyblog.com' + info_item['Url']

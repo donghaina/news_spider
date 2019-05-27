@@ -20,7 +20,7 @@ class NewsSpider(scrapy.Spider):
             news_item = NewsSpiderItem()
             published_at = info_item.xpath(".//div[@class='a-content']/p[@class='one-more clearfix']/span[@class='time']/text()").extract_first().strip()
             news_item['published_at'] = int(datetime.datetime.strptime(published_at, "%Y-%m-%d").timestamp())
-            if self.deadline >= news_item['published_at']:
+            if self.deadline > news_item['published_at']:
                 return
             news_item['title'] = info_item.xpath(".//div[@class='a-content']/h3[@class='a-title']/a/text()").extract_first()
             news_item['origin_website'] = '电子发烧友网'

@@ -29,7 +29,7 @@ class NewsSpider(scrapy.Spider):
             news_item['created_at'] = int(datetime.datetime.now().timestamp())
             news_item['published_at'] = int(datetime.datetime.strptime(info_item['addtimeStr'], "%Y-%m-%d %H:%M:%S").timestamp())
 
-            if self.deadline >= news_item['published_at']:
+            if self.deadline > news_item['published_at']:
                 return
 
             yield news_item

@@ -35,7 +35,7 @@ class NewsSpider(scrapy.Spider):
             published_at = info_item.xpath(".//td[@class='fw_s']/text()").extract_first()
             if published_at:
                 news_item['published_at'] = int(datetime.datetime.strptime('20' + published_at.strip(), "%Y-%m-%d").timestamp())
-                if self.deadline >= news_item['published_at']:
+                if self.deadline > news_item['published_at']:
                     return
                 yield news_item
             else:

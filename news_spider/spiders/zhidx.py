@@ -49,7 +49,7 @@ class NewsSpider(scrapy.Spider):
         item = response.meta['item']
         published_at = response.xpath("//div[@class='post-related']/span[@class='time']/text()").extract_first().strip()
         item['published_at'] = int(datetime.datetime.strptime(published_at, "%Y/%m/%d").timestamp())
-        if self.deadline >= item['published_at']:
+        if self.deadline > item['published_at']:
             raise CloseSpider('已经爬到续点了，强制停止')
         else:
             yield item

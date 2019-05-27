@@ -35,7 +35,7 @@ class NewsSpider(scrapy.Spider):
                 print(published_at_text)
                 published_at = re.sub(u"[(\()(\))]", "", published_at_text.strip())
                 news_item['published_at'] = int(datetime.datetime.strptime(published_at, "%Y-%m-%d %H:%M:%S").timestamp())
-                if self.deadline >= news_item['published_at']:
+                if self.deadline > news_item['published_at']:
                     return
             else:
                 continue
