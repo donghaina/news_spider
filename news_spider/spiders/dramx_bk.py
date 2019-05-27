@@ -8,7 +8,7 @@ from news_spider.pipelines import NewsSpiderPipeline
 
 
 class NewsSpider(scrapy.Spider):
-    name = 'dramx'
+    name = 'dramx_bk'
     allowed_domains = ['www.dramx.com']
     start_urls = ['https://www.dramx.com/News/', 'https://www.dramx.com/Market/', 'https://www.dramx.com/Topic/']
     news_pipeline = NewsSpiderPipeline()
@@ -32,7 +32,11 @@ class NewsSpider(scrapy.Spider):
             news_item['section'] = '全球半导体观察 > ' + response.xpath("//a[@class='Article-boxtitle-active']/text()").extract_first()
             news_item['abstract'] = info_item.xpath(".//p[@class='Article-essay']/text()").extract_first()
             news_item['created_at'] = int(datetime.datetime.now().timestamp())
-            scrapy.Request(news_item['origin_url'], meta={'item': news_item}, callback=self.detail_parse)
+            published_at_text = info_item.xpath(".//p[@class='Article-date']/text()").extract_first()
+            published_at = int(datetime.datetime.strptime(published_at_text, "%Y-%m-%d").timestamp())
+            if self.deadline >= published_at:
+                return
+            yield scrapy.Request(news_item['origin_url'], meta={'item': news_item}, callback=self.detail_parse)
 
         next_link = response.xpath("(//div[@class='jogger']/a)[last()]/@href").extract_first()
 
@@ -43,6 +47,4 @@ class NewsSpider(scrapy.Spider):
         item = response.meta['item']
         published_at = response.xpath("//div[@class='newstitle-bottom']/p/time/text()").extract_first().strip()
         item['published_at'] = int(datetime.datetime.strptime(published_at, "%Y-%m-%d %H:%M:%S").timestamp())
-        if self.deadline >= item['published_at']:
-            return
         yield item

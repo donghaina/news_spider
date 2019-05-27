@@ -4,6 +4,7 @@ import scrapy
 import time
 import datetime
 from news_spider.items import NewsSpiderItem
+from news_spider.pipelines import NewsSpiderPipeline
 
 
 # 状态，完成了后续页面的抓取，第一个页面的需要单独添加
@@ -13,8 +14,10 @@ class NewsSpider(scrapy.Spider):
     allowed_domains = ['ecar.semi.org.cn']
     start_page = 1
     start_urls = ['http://ecar.semi.org.cn']
-
-    # deadline = int(time.time()) - 10 * 24 * 3600  # 暂时只抓取10天之内的数据
+    news_pipeline = NewsSpiderPipeline()
+    db_cursor = news_pipeline.cursor
+    db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
+    deadline = int(db_cursor.fetchone()[0])
 
     # parse first page
     def parse(self, response):
@@ -31,10 +34,8 @@ class NewsSpider(scrapy.Spider):
             news_item['created_at'] = int(datetime.datetime.now().timestamp())
             published_at = info_item.xpath(".//div[@class='inputdate']/text()").extract_first()
             news_item['published_at'] = self.parse_timestamp(published_at)
-            # if self.deadline > news_item['published_at']:
-            #     return
-
-            # print(news_item)
+            if self.deadline >= news_item['published_at']:
+                return
 
             yield news_item
 

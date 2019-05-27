@@ -3,6 +3,7 @@ import scrapy
 import datetime
 import json
 from news_spider.items import NewsSpiderItem
+from news_spider.pipelines import NewsSpiderPipeline
 
 
 class NewsSpider(scrapy.Spider):
@@ -10,8 +11,10 @@ class NewsSpider(scrapy.Spider):
     allowed_domains = ['ai.ofweek.com']
     start_urls = ['https://ai.ofweek.com/CAT-201718-nlp-1.html']
     start_page = 1
-
-    deadline = int(datetime.datetime.strptime('2016-09-09 00:02:00', "%Y-%m-%d %H:%M:%S").timestamp())
+    news_pipeline = NewsSpiderPipeline()
+    db_cursor = news_pipeline.cursor
+    db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
+    deadline = int(db_cursor.fetchone()[0])
 
     def parse(self, response):
         news_list = json.loads(response.body_as_unicode())['newsList']
@@ -26,7 +29,7 @@ class NewsSpider(scrapy.Spider):
             news_item['created_at'] = int(datetime.datetime.now().timestamp())
             news_item['published_at'] = int(datetime.datetime.strptime(info_item['addtimeStr'], "%Y-%m-%d %H:%M:%S").timestamp())
 
-            if self.deadline == news_item['published_at']:
+            if self.deadline >= news_item['published_at']:
                 return
 
             yield news_item

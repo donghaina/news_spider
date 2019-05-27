@@ -3,13 +3,16 @@ import scrapy
 import datetime
 import re
 from news_spider.items import NewsSpiderItem
-
+from news_spider.pipelines import NewsSpiderPipeline
 
 class NewsSpider(scrapy.Spider):
     name = 'semi_ac'
     allowed_domains = ['www.semi.ac.cn']
     start_urls = ['http://www.semi.ac.cn/xwdt/kyjz/', 'http://www.semi.ac.cn/2017xshd_136831/', 'http://www.semi.ac.cn/xslw/']
-
+    news_pipeline = NewsSpiderPipeline()
+    db_cursor = news_pipeline.cursor
+    db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
+    deadline = int(db_cursor.fetchone()[0])
     def err_callback(self, response):
         print('----出错了----')
         print(response)

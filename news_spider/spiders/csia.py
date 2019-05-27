@@ -3,12 +3,17 @@ import scrapy
 import datetime
 import re
 from news_spider.items import NewsSpiderItem
+from news_spider.pipelines import NewsSpiderPipeline
 
 
 class NewsSpider(scrapy.Spider):
     name = 'csia'
     allowed_domains = ['www.csia.net.cn']
     start_urls = ['http://www.csia.net.cn/Article/ShowClass.asp?ClassID=80&page=1']
+    news_pipeline = NewsSpiderPipeline()
+    db_cursor = news_pipeline.cursor
+    db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
+    deadline = int(db_cursor.fetchone()[0])
 
     def err_callback(self, response):
         print('----出错了----')
@@ -30,6 +35,8 @@ class NewsSpider(scrapy.Spider):
                 print(published_at_text)
                 published_at = re.sub(u"[(\()(\))]", "", published_at_text.strip())
                 news_item['published_at'] = int(datetime.datetime.strptime(published_at, "%Y-%m-%d %H:%M:%S").timestamp())
+                if self.deadline >= news_item['published_at']:
+                    return
             else:
                 continue
             # print(news_item)

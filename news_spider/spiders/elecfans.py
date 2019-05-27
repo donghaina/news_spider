@@ -2,13 +2,16 @@
 import scrapy
 import datetime
 from news_spider.items import NewsSpiderItem
-
+from news_spider.pipelines import NewsSpiderPipeline
 
 class NewsSpider(scrapy.Spider):
     name = 'elecfans'
     allowed_domains = ['www.elecfans.com']
     start_urls = ['http://www.elecfans.com/rengongzhineng']
-
+    news_pipeline = NewsSpiderPipeline()
+    db_cursor = news_pipeline.cursor
+    db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
+    deadline = int(db_cursor.fetchone()[0])
     def parse(self, response):
         news_list = response.xpath("//div[@class='article-list']")
         for info_item in news_list:

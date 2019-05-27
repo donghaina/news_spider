@@ -2,6 +2,7 @@
 import scrapy
 import datetime
 from news_spider.items import NewsSpiderItem
+from news_spider.pipelines import NewsSpiderPipeline
 
 
 class NewsSpider(scrapy.Spider):
@@ -12,6 +13,10 @@ class NewsSpider(scrapy.Spider):
     start_page = 0
     param_viewstate = ''
     param_viewstategenerator = ''
+    news_pipeline = NewsSpiderPipeline()
+    db_cursor = news_pipeline.cursor
+    db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
+    deadline = int(db_cursor.fetchone()[0])
 
     def parse_login(self, response):
         print('start to process login ')
@@ -50,7 +55,7 @@ class NewsSpider(scrapy.Spider):
 
         if next_link:
             self.start_page = self.start_page + 1
-            print('正在爬第几页',self.start_page)
+            print('正在爬第几页', self.start_page)
             yield scrapy.FormRequest(
                 url=self.start_urls[0],
                 formdata={'__EVENTTARGET': 'AspNetPager1',

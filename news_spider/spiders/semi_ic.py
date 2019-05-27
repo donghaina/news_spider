@@ -4,7 +4,7 @@ import scrapy
 import time
 import datetime
 from news_spider.items import NewsSpiderItem
-
+from news_spider.pipelines import NewsSpiderPipeline
 
 class NewsSpider(scrapy.Spider):
     name = 'semi_ic'

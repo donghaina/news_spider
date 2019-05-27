@@ -3,17 +3,21 @@ import scrapy
 import time
 import datetime
 from news_spider.items import NewsSpiderItem
+from news_spider.pipelines import NewsSpiderPipeline
 
 
 class NewsSpider(scrapy.Spider):
     name = 'ailab'
     allowed_domains = ['www.ailab.cn']
     start_urls = ['http://www.ailab.cn']
-    today = time.strftime('%Y-%m-%d', time.localtime())
+    news_pipeline = NewsSpiderPipeline()
+    db_cursor = news_pipeline.cursor
+    db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
+    deadline = int(db_cursor.fetchone()[0])
 
     def parse(self, response):
+        print(int(self.deadline))
         news_list = response.xpath("//ul[@class='list_jc']/li")
-
         for info_item in news_list:
             news_item = NewsSpiderItem()
             news_item['title'] = info_item.xpath(".//a[1]/@title").extract_first()
@@ -25,9 +29,8 @@ class NewsSpider(scrapy.Spider):
             news_item['created_at'] = int(datetime.datetime.now().timestamp())
             published_at = info_item.xpath(".//p[@class='xx']/span[@class='rq']/text()").extract_first().strip()
             news_item['published_at'] = int(datetime.datetime.strptime(published_at, "%Y-%m-%d").timestamp())
-            # if self.today != news_item['published_at']:
-            #     return
-
+            if self.deadline >= news_item['published_at']:
+                return
             yield news_item
 
         next_link = response.xpath(

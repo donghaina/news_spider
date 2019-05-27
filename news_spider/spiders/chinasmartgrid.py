@@ -2,12 +2,17 @@
 import scrapy
 import datetime
 from news_spider.items import NewsSpiderItem
+from news_spider.pipelines import NewsSpiderPipeline
 
 
 class NewsSpider(scrapy.Spider):
     name = 'chinasmartgrid'
     allowed_domains = ['www.chinasmartgrid.com.cn']
     start_urls = ['http://www.chinasmartgrid.com.cn/List-News?rid=119']
+    news_pipeline = NewsSpiderPipeline()
+    db_cursor = news_pipeline.cursor
+    db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
+    deadline = int(db_cursor.fetchone()[0])
 
     def parse(self, response):
         news_list = response.xpath("//ul[@class='list_left_ul']/li[not(@class='dashed_line')]")
@@ -23,6 +28,8 @@ class NewsSpider(scrapy.Spider):
             news_item['created_at'] = int(datetime.datetime.now().timestamp())
             published_at = info_item.xpath(".//span/text()").extract_first().strip()
             news_item['published_at'] = int(datetime.datetime.strptime(published_at, "%Y-%m-%d").timestamp())
+            if self.deadline >= news_item['published_at']:
+                return
             yield news_item
 
         next_link = response.xpath("//div[@class='list_page']/div[@class='page']/a[@title='下一页']/@href").extract_first()

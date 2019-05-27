@@ -3,14 +3,17 @@ import scrapy
 import datetime
 import json
 from news_spider.items import NewsSpiderItem
-
+from news_spider.pipelines import NewsSpiderPipeline
 
 class NewsSpider(scrapy.Spider):
     name = 'zhidx'
     allowed_domains = ['zhidx.com']
     start_urls = ['http://zhidx.com/wp-admin/admin-ajax.php']
     start_page = 1
-
+    news_pipeline = NewsSpiderPipeline()
+    db_cursor = news_pipeline.cursor
+    db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
+    deadline = int(db_cursor.fetchone()[0])
     def start_requests(self):
         return [scrapy.FormRequest(url=self.start_urls[0], formdata={'action': 'category_list', 'page': str(self.start_page)}, callback=self.parse_list)]
 
