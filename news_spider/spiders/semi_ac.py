@@ -5,6 +5,7 @@ import re
 from news_spider.items import NewsSpiderItem
 from news_spider.pipelines import NewsSpiderPipeline
 
+
 class NewsSpider(scrapy.Spider):
     name = 'semi_ac'
     allowed_domains = ['www.semi.ac.cn']
@@ -13,6 +14,7 @@ class NewsSpider(scrapy.Spider):
     db_cursor = news_pipeline.cursor
     db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
     deadline = int(db_cursor.fetchone()[0])
+
     def err_callback(self, response):
         print('----出错了----')
         print(response)
@@ -33,6 +35,8 @@ class NewsSpider(scrapy.Spider):
             published_at = info_item.xpath(".//td[@class='fw_s']/text()").extract_first()
             if published_at:
                 news_item['published_at'] = int(datetime.datetime.strptime('20' + published_at.strip(), "%Y-%m-%d").timestamp())
+                if self.deadline >= news_item['published_at']:
+                    return
                 yield news_item
             else:
                 continue

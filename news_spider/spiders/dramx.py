@@ -2,9 +2,10 @@
 import scrapy
 import datetime
 import re
-import sys
+import os
 from news_spider.items import NewsSpiderItem
 from news_spider.pipelines import NewsSpiderPipeline
+from scrapy.exceptions import CloseSpider
 
 
 class NewsSpider(scrapy.Spider):
@@ -21,7 +22,6 @@ class NewsSpider(scrapy.Spider):
         print(response)
 
     def parse(self, response):
-        print(response.headers)
         news_list = response.xpath("//div[@id='divArticleList']/div[contains(@class,'Article-box-cont')]/div[@class='Article-content']")
         for info_item in news_list:
             news_item = NewsSpiderItem()
@@ -44,5 +44,5 @@ class NewsSpider(scrapy.Spider):
         published_at = response.xpath("//div[@class='newstitle-bottom']/p/time/text()").extract_first().strip()
         item['published_at'] = int(datetime.datetime.strptime(published_at, "%Y-%m-%d %H:%M:%S").timestamp())
         if self.deadline >= item['published_at']:
-            return
+            raise CloseSpider('已经爬到续点了，强制停止')
         yield item

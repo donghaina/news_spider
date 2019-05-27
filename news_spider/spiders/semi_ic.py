@@ -6,6 +6,7 @@ import datetime
 from news_spider.items import NewsSpiderItem
 from news_spider.pipelines import NewsSpiderPipeline
 
+
 class NewsSpider(scrapy.Spider):
     name = 'semi_ic'
     domain = 'http://www.semi.org.cn/technology/'
@@ -13,9 +14,12 @@ class NewsSpider(scrapy.Spider):
     start_urls = ['http://www.semi.org.cn/technology/news_list.aspx?classid=19']
     start_page = 0
 
-    deadline = int(time.time()) - 10 * 24 * 3600  # 暂时只抓取10天之内的数据
     param_viewstate = ''
     param_viewstategenerator = ''
+    news_pipeline = NewsSpiderPipeline()
+    db_cursor = news_pipeline.cursor
+    db_cursor.execute("""select max(published_at) from news_source where origin_host = %s""", allowed_domains[0])
+    deadline = int(db_cursor.fetchone()[0])
 
     def parse_login(self, response):
         print('start to process login ')
@@ -24,6 +28,7 @@ class NewsSpider(scrapy.Spider):
         print('start real request')
         return [
             scrapy.FormRequest(
+                dont_filter=True,
                 url=self.start_urls[0],
                 formdata={'__EVENTTARGET': 'AspNetPager1',
                           '__EVENTARGUMENT': str(self.start_page),
@@ -34,7 +39,7 @@ class NewsSpider(scrapy.Spider):
         ]
 
     def start_requests(self):
-        return [scrapy.FormRequest(url=self.start_urls[0], formdata={}, callback=self.parse_login)]
+        return [scrapy.FormRequest(url=self.start_urls[0], formdata={}, dont_filter=True, callback=self.parse_login)]
 
     def parse(self, response):
         news_list = response.xpath("//table[@class='gongzuo']/tr")
@@ -49,16 +54,17 @@ class NewsSpider(scrapy.Spider):
             news_item['abstract'] = ''
             news_item['published_at'] = int(datetime.datetime.strptime(published_at_text, "%Y-%m-%d").timestamp())
             news_item['created_at'] = int(datetime.datetime.now().timestamp())
+            if self.deadline >= news_item['published_at']:
+                return
             yield news_item
-        #     if self.deadline > news_item['published_at']:
-        #         return
-        #
+
         next_link = response.xpath("//table[@id='AspNetPager1']//tr/td/a[contains('下一页',text())]/@href").extract_first()
 
         if next_link:
             self.start_page = self.start_page + 1
             yield scrapy.FormRequest(
                 url=self.start_urls[0],
+                dont_filter=True,
                 formdata={'__EVENTTARGET': 'AspNetPager1',
                           '__EVENTARGUMENT': str(self.start_page),
                           '__VIEWSTATE': self.param_viewstate,

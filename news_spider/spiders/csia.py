@@ -44,7 +44,6 @@ class NewsSpider(scrapy.Spider):
 
         next_link = response.xpath(
             "//div[@class='showpage']/form/a[contains(text(),'下一页')]/@href").extract_first()
-        print()
 
         if next_link:
             yield scrapy.Request('http://www.csia.net.cn/Article/' + next_link, callback=self.parse, errback=self.err_callback)

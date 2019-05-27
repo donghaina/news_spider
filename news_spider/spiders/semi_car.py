@@ -36,7 +36,6 @@ class NewsSpider(scrapy.Spider):
             news_item['published_at'] = self.parse_timestamp(published_at)
             if self.deadline >= news_item['published_at']:
                 return
-
             yield news_item
 
         self.start_page = self.start_page + 1
